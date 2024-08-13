@@ -8,5 +8,3 @@ requests
 dropbox
 python-dateutil
 pyhtml2pdf
-datetime
-tempfile
