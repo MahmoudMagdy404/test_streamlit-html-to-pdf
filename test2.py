@@ -29,6 +29,8 @@ import logging
 import html
 from google.auth.transport.requests import Request
 from pyhtml2pdf import converter
+from weasyprint import HTML
+
 
 style = """
 <style>
@@ -186,11 +188,13 @@ I, the undersigned, certify that the prescribed orthosis is medically necessary 
     </body>
     </html>
     """
-def merge_pdfs(pdf_files):
-    # Initialize the merger object
-    merger = PdfMerger()
+def generate_pdf(html_content, filename):
+    HTML(string=html_content).write_pdf(filename)
 
-    # Combine all generated PDFs into a single PDF
+def merge_pdfs(pdf_files):
+    from PyPDF2 import PdfMerger
+
+    merger = PdfMerger()
     combined_pdf_filename = f"combined_brace_forms_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
 
     for pdf_file in pdf_files:
@@ -199,24 +203,7 @@ def merge_pdfs(pdf_files):
     merger.write(combined_pdf_filename)
     merger.close()
 
-    # Provide download button for the combined PDF
-    with open(combined_pdf_filename, "rb") as pdf_file:
-        st.download_button(
-            label="Download Combined Brace Forms PDF",
-            data=pdf_file,
-            file_name=combined_pdf_filename,
-            mime="application/pdf"
-        )
-
-    # Clean up individual PDF files and combined file
-    for pdf_file in pdf_files:
-        os.unlink(pdf_file)
-
-    os.unlink(combined_pdf_filename)
-
-    st.success(f"{len(pdf_files)} PDF form(s) are ready for download. Please click the download button above.")
-
-
+    return combined_pdf_filename
 def generate_cover_page_html(chaser_name, to_name, fax_subject, fax_message, date, sender_email, receiver_number ):
     html_body = f"""
 <!DOCTYPE html>
@@ -1378,25 +1365,29 @@ def main():
                                 Selected_Brace=brace_code,
                                 Brace_info=brace_description
                             )
-                            # Create a unique filename for each PDF
+                            # Create a temporary file for the PDF
                             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            pdf_filename = f"brace_form_{brace_code}_{timestamp}.pdf"
-
-                            # Convert the HTML to PDF
-                            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as temp_file:
-                                temp_file.write(html_filled)
-                                temp_file_path = temp_file.name
-
-                            converter.convert(temp_file_path, pdf_filename)
-                            
-                            # Store the PDF filename
+                            pdf_filename = f"brace_form_{timestamp}.pdf"
+                            generate_pdf(html_filled, pdf_filename)
                             pdf_files.append(pdf_filename)
 
-                            os.unlink(temp_file_path)  # Clean up the temporary HTML file
+                            # Merge PDFs if multiple are generated
+                            combined_pdf_filename = merge_pdfs(pdf_files)
 
-                        # Combine all generated PDFs into a single PDF
-                        combined_pdf_filename = f"combined_brace_forms_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-                        merge_pdfs(pdf_files)
+                            with open(combined_pdf_filename, "rb") as pdf_file:
+                                st.download_button(
+                                    label="Download Combined Brace Forms PDF",
+                                    data=pdf_file,
+                                    file_name=combined_pdf_filename,
+                                    mime="application/pdf"
+                                )
+
+                            # Clean up
+                            for pdf_file in pdf_files:
+                                os.unlink(pdf_file)
+
+                            os.unlink(combined_pdf_filename)
+                            st.success("PDFs are ready for download.")
 
                         # for pdf_file in pdf_files:
                         #     merger.append(pdf_file)

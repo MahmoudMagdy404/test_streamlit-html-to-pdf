@@ -1,10 +1,5 @@
 streamlit
-google-auth
-google-auth-oauthlib
-google-auth-httplib2
-google-api-python-client
+weasyprint
+pandas
 PyPDF2
 requests
-dropbox
-python-dateutil
-pyhtml2pdf
