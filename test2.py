@@ -8,14 +8,10 @@ import requests
 from PyPDF2 import PdfMerger, PdfReader
 import re
 import base64
-from google.oauth2 import service_account
 import streamlit as st
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
+
 import io
 import json
-from google_auth_oauthlib.flow import InstalledAppFlow
 # import google.auth
 # from faxplus import ApiClient, OutboxApi, OutboxComment, RetryOptions, OutboxOptions, OutboxCoverPage, PayloadOutbox , FilesApi 
 # from faxplus.configuration import Configuration
@@ -24,11 +20,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 import logging
 import html
-from google.auth.transport.requests import Request
-from pyhtml2pdf import converter
+# from pyhtml2pdf import converter
 from weasyprint import HTML
 
 
@@ -192,7 +186,6 @@ def generate_pdf(html_content, filename):
     HTML(string=html_content).write_pdf(filename)
 
 def merge_pdfs(pdf_files):
-    from PyPDF2 import PdfMerger
 
     merger = PdfMerger()
     combined_pdf_filename = f"combined_brace_forms_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
@@ -943,147 +936,147 @@ SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 
-# Constants
-SCOPES = ["https://www.googleapis.com/auth/drive"]
-FOLDER_ID = "15I95Loh35xI2PcGa36xz7SgMtclo-9DC"
-GITHUB_USER = 'MahmoudMagdy404'
-GITHUB_PAO = st.secrets["github_token"]["token"]
-TOKEN_FILE_URL = "https://api.github.com/repos/MahmoudMagdy404/files_holder/contents/token.json"
+# # Constants
+# SCOPES = ["https://www.googleapis.com/auth/drive"]
+# FOLDER_ID = "15I95Loh35xI2PcGa36xz7SgMtclo-9DC"
+# GITHUB_USER = 'MahmoudMagdy404'
+# GITHUB_PAO = st.secrets["github_token"]["token"]
+# TOKEN_FILE_URL = "https://api.github.com/repos/MahmoudMagdy404/files_holder/contents/token.json"
 
-def read_token_from_github():
-    """Read the token from GitHub repository."""
-    github_session = requests.Session()
-    github_session.auth = (GITHUB_USER, GITHUB_PAO)
-    try:
-        response = github_session.get(TOKEN_FILE_URL)
-        response.raise_for_status()
-        content = response.json()['content']
-        decoded_content = base64.b64decode(content).decode('utf-8')
-        return json.loads(decoded_content)
-    except Exception as e:
-        st.error(f"Failed to read token from GitHub: {e}")
-        return None
+# def read_token_from_github():
+#     """Read the token from GitHub repository."""
+#     github_session = requests.Session()
+#     github_session.auth = (GITHUB_USER, GITHUB_PAO)
+#     try:
+#         response = github_session.get(TOKEN_FILE_URL)
+#         response.raise_for_status()
+#         content = response.json()['content']
+#         decoded_content = base64.b64decode(content).decode('utf-8')
+#         return json.loads(decoded_content)
+#     except Exception as e:
+#         st.error(f"Failed to read token from GitHub: {e}")
+#         return None
 
-def write_token_to_github(token_data):
-    """Write the token to GitHub repository."""
-    github_session = requests.Session()
-    github_session.auth = (GITHUB_USER, GITHUB_PAO)
-    try:
-        response = github_session.get(TOKEN_FILE_URL)
-        response.raise_for_status()
-        current_file = response.json()
+# def write_token_to_github(token_data):
+#     """Write the token to GitHub repository."""
+#     github_session = requests.Session()
+#     github_session.auth = (GITHUB_USER, GITHUB_PAO)
+#     try:
+#         response = github_session.get(TOKEN_FILE_URL)
+#         response.raise_for_status()
+#         current_file = response.json()
         
-        content = base64.b64encode(json.dumps(token_data).encode()).decode()
+#         content = base64.b64encode(json.dumps(token_data).encode()).decode()
         
-        data = {
-            "message": "Update token.json",
-            "content": content,
-            "sha": current_file['sha']
-        }
+#         data = {
+#             "message": "Update token.json",
+#             "content": content,
+#             "sha": current_file['sha']
+#         }
         
-        response = github_session.put(TOKEN_FILE_URL, json=data)
-        response.raise_for_status()
-        st.success("Token updated successfully in GitHub.")
-    except Exception as e:
-        st.error(f"Failed to write token to GitHub: {e}")
+#         response = github_session.put(TOKEN_FILE_URL, json=data)
+#         response.raise_for_status()
+#         st.success("Token updated successfully in GitHub.")
+#     except Exception as e:
+#         st.error(f"Failed to write token to GitHub: {e}")
 
-def get_drive_service(creds):
-    """Get Google Drive service."""
-    return build('drive', 'v3', credentials=creds)
+# def get_drive_service(creds):
+#     """Get Google Drive service."""
+#     return build('drive', 'v3', credentials=creds)
 
-def get_credentials():
-    """Get or refresh Google credentials."""
-    token_data = read_token_from_github()
+# def get_credentials():
+#     """Get or refresh Google credentials."""
+#     token_data = read_token_from_github()
     
-    if not token_data:
-        st.warning("No token found in GitHub. Initiating new authentication flow.")
-        flow = InstalledAppFlow.from_client_config(
-            json.loads(st.secrets["google_credentials"]["credentials_json"]),
-            SCOPES
-        )
-        creds = flow.run_local_server(port=0)
-        write_token_to_github(json.loads(creds.to_json()))
-        return creds
+#     if not token_data:
+#         st.warning("No token found in GitHub. Initiating new authentication flow.")
+#         flow = InstalledAppFlow.from_client_config(
+#             json.loads(st.secrets["google_credentials"]["credentials_json"]),
+#             SCOPES
+#         )
+#         creds = flow.run_local_server(port=0)
+#         write_token_to_github(json.loads(creds.to_json()))
+#         return creds
     
-    creds = Credentials.from_authorized_user_info(token_data, SCOPES)
+#     creds = Credentials.from_authorized_user_info(token_data, SCOPES)
     
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            write_token_to_github(json.loads(creds.to_json()))
-        else:
-            flow = InstalledAppFlow.from_client_config(
-                json.loads(st.secrets["google_credentials"]["credentials_json"]),
-                SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-            write_token_to_github(json.loads(creds.to_json()))
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#             write_token_to_github(json.loads(creds.to_json()))
+#         else:
+#             flow = InstalledAppFlow.from_client_config(
+#                 json.loads(st.secrets["google_credentials"]["credentials_json"]),
+#                 SCOPES
+#             )
+#             creds = flow.run_local_server(port=0)
+#             write_token_to_github(json.loads(creds.to_json()))
     
-    return creds
+#     return creds
 
-def combine_pdfs(fname):
-    """Combine PDFs from Google Drive folder."""
-    creds = get_credentials()
-    if not creds:
-        return None, "Failed to obtain valid credentials. Please try authenticating again."
+# def combine_pdfs(fname):
+#     """Combine PDFs from Google Drive folder."""
+#     creds = get_credentials()
+#     if not creds:
+#         return None, "Failed to obtain valid credentials. Please try authenticating again."
 
-    try:
-        service = get_drive_service(creds)
-        query = f"'{FOLDER_ID}' in parents"
+#     try:
+#         service = get_drive_service(creds)
+#         query = f"'{FOLDER_ID}' in parents"
 
-        st.info("Querying Google Drive...")
-        results = service.files().list(q=query, pageSize=20, fields="nextPageToken, files(id, name, mimeType)").execute()
-        items = results.get("files", [])
+#         st.info("Querying Google Drive...")
+#         results = service.files().list(q=query, pageSize=20, fields="nextPageToken, files(id, name, mimeType)").execute()
+#         items = results.get("files", [])
 
-        if not items:
-            return None, "No files found in the specified folder."
+#         if not items:
+#             return None, "No files found in the specified folder."
 
-        fname = fname.strip().lower()
-        target_files = [file for file in items if fname in file["name"].lower()]
+#         fname = fname.strip().lower()
+#         target_files = [file for file in items if fname in file["name"].lower()]
 
-        st.info(f"Searching for files with name containing: {fname}")
-        for file in items:
-            st.info(f"Found file: {file['name']}")
+#         st.info(f"Searching for files with name containing: {fname}")
+#         for file in items:
+#             st.info(f"Found file: {file['name']}")
 
-        if not target_files:
-            return None, "No matching files found."
+#         if not target_files:
+#             return None, "No matching files found."
 
-        st.info(f"Found {len(target_files)} matching files. Combining PDFs...")
+#         st.info(f"Found {len(target_files)} matching files. Combining PDFs...")
 
-        merger = PdfMerger()
-        for target_file in target_files:
-            mime_type = target_file.get("mimeType")
-            file_id = target_file.get("id")
+#         merger = PdfMerger()
+#         for target_file in target_files:
+#             mime_type = target_file.get("mimeType")
+#             file_id = target_file.get("id")
 
-            st.info(f"Processing file: {target_file['name']}")
+#             st.info(f"Processing file: {target_file['name']}")
 
-            if mime_type.startswith("application/vnd.google-apps."):
-                request = service.files().export_media(fileId=file_id, mimeType="application/pdf")
-            else:
-                request = service.files().get_media(fileId=file_id)
+#             if mime_type.startswith("application/vnd.google-apps."):
+#                 request = service.files().export_media(fileId=file_id, mimeType="application/pdf")
+#             else:
+#                 request = service.files().get_media(fileId=file_id)
 
-            fh = io.BytesIO()
-            downloader = MediaIoBaseDownload(fh, request)
-            done = False
-            while not done:
-                status, done = downloader.next_chunk()
-                st.info(f"Download {int(status.progress() * 100)}%")
-            fh.seek(0)
+#             fh = io.BytesIO()
+#             downloader = MediaIoBaseDownload(fh, request)
+#             done = False
+#             while not done:
+#                 status, done = downloader.next_chunk()
+#                 st.info(f"Download {int(status.progress() * 100)}%")
+#             fh.seek(0)
 
-            pdf_reader = PdfReader(fh)
-            merger.append(pdf_reader)
+#             pdf_reader = PdfReader(fh)
+#             merger.append(pdf_reader)
 
-        st.info("Finalizing PDF...")
-        output = io.BytesIO()
-        merger.write(output)
-        merger.close()
-        output.seek(0)
-        st.info("PDF combination complete!")
+#         st.info("Finalizing PDF...")
+#         output = io.BytesIO()
+#         merger.write(output)
+#         merger.close()
+#         output.seek(0)
+#         st.info("PDF combination complete!")
 
-        return output, None
-    except Exception as error:
-        st.error(f"An error occurred: {str(error)}")
-        return None, str(error)
+#         return output, None
+#     except Exception as error:
+#         st.error(f"An error occurred: {str(error)}")
+#         return None, str(error)
 
     
 def main():
@@ -1101,136 +1094,6 @@ def main():
     st.sidebar.markdown("- OH")
     st.sidebar.markdown("- KY")
     if page == "Form Submission":
-        # st.title("Brace Form Submission")
-        
-        # st.header("Patient and Doctor Information")
-        # col1, col2 = st.columns(2)
-        
-        # with col1:
-        #     st.subheader("Patient Information")
-        #     date = st.date_input("Date")
-        #     fname = st.text_input("First Name")
-        #     lname = st.text_input("Last Name")
-        #     ptPhone = st.text_input("Patient Phone Number")
-        #     ptAddress = st.text_input("Patient Address")
-        #     ptCity = st.text_input("Patient City")
-        #     ptState = st.text_input("Patient State")
-        #     ptZip = st.text_input("Patient Zip Code")
-        #     ptDob = st.text_input("Date of Birth")
-        #     medID = st.text_input("MBI")
-        #     ptHeight = st.text_input("Height")
-        #     ptWeight = st.text_input("Weight")
-        #     ptGender = st.selectbox("Gender", ["Male", "Female"])
-
-        # with col2:
-        #     st.subheader("Doctor Information")
-        #     drName = st.text_input("Doctor Name")
-        #     drAddress = st.text_input("Doctor Address")
-        #     drCity = st.text_input("Doctor City")
-        #     drState = st.text_input("Doctor State")
-        #     drZip = st.text_input("Doctor Zip Code")
-        #     drPhone = st.text_input("Doctor Phone Number")
-        #     drFax = st.text_input("Doctor Fax Number")
-        #     drNpi = st.text_input("Doctor NPI")
-
-        # st.header("Select Braces")
-        # brace_columns = st.columns(len(Braces))
-        # selected_forms = {}
-        # # Create two rows of columns: 3 columns in the first row, 4 columns in the second row
-        # col1, col2, col3 = st.columns(3)
-        # col4, col5, col6, col7 = st.columns(4)
-
-        # # Function to handle displaying the braces and their forms
-        # def display_brace(brace, column):
-        #     if brace not in st.session_state:
-        #         st.session_state[brace] = "None"
-
-        #     with column:
-        #         st.subheader(f"{brace} Brace")
-        #         brace_options = ["None"] + list(BracesForms[brace].keys())
-        #         selected_forms[brace] = st.radio(
-        #             f"Select {brace} Brace",
-        #             brace_options,
-        #             key=brace,
-        #             index=brace_options.index(st.session_state[brace])
-        #         )
-
-        # # Display the first 3 braces in the first row
-        # for idx, brace in enumerate(Braces[:3]):
-        #     display_brace(brace, [col1, col2, col3][idx])
-
-        # # Display the remaining 4 braces in the second row
-        # for idx, brace in enumerate(Braces[3:]):
-        #     display_brace(brace, [col4, col5, col6, col7][idx])
-
-        # def validate_all_fields():
-        #     required_fields = [
-        #         fname, lname, ptPhone, ptAddress,
-        #         ptCity, ptState, ptZip, ptDob, medID,
-        #         ptHeight, ptWeight, drName,
-        #         drAddress, drCity, drState, drZip,
-        #         drPhone, drFax, drNpi
-        #     ]
-        #     for field in required_fields:
-        #         if not field:
-        #             st.warning(f"{field} is required.")
-        #             return False
-        #     return True
-
-        # if st.button("Submit"):
-        #     if not validate_all_fields():
-        #         st.warning("Please fill out all required fields.")
-        #     else:
-        #         selected_urls = []
-        #         for brace_type, brace_code in selected_forms.items():
-        #             if brace_code != "None":
-        #                 url = BracesForms[brace_type][brace_code]
-        #                 selected_urls.append((brace_type, url))
-
-        #         if not selected_urls:
-        #             st.warning("Please select at least one brace form.")
-        #         else:
-        #             for brace_type, url in selected_urls:
-        #                 form_data = {
-        #                     "entry.1545087922": date.strftime("%m/%d/%Y"),
-        #                     "entry.1992907553": fname,
-        #                     "entry.1517085063": lname,
-        #                     "entry.1178853697": ptPhone,
-        #                     "entry.478400313": ptAddress,
-        #                     "entry.1687085318": ptCity,
-        #                     "entry.1395966108": ptState,
-        #                     "entry.1319952523": ptZip,
-        #                     "entry.1553550428": ptDob,
-        #                     "entry.1122949100": medID,
-        #                     "entry.2102408689": ptHeight,
-        #                     "entry.1278616009": ptWeight,
-        #                     "entry.1322384700": ptGender,
-        #                     "entry.2090908898": drName,
-        #                     "entry.198263517": drAddress,
-        #                     "entry.1349410133": drCity,
-        #                     "entry.847367280": drState,
-        #                     "entry.1652935364": drZip,
-        #                     "entry.756850883": drPhone,
-        #                     "entry.1725680069": drFax,
-        #                     "entry.314880762": drNpi
-        #                 }
-
-        #                 encoded_data = urlencode(form_data, quote_via=quote_plus)
-        #                 full_url = f"{url}?{encoded_data}"
-                        
-        #                 # Test the URL
-        #                 try:
-        #                     response = requests.get(full_url)
-        #                     if response.status_code == 200:
-        #                         # webbrowser.open(full_url)
-
-        #                         st.write(f"[Click here to open the form for {brace_type} brace](<{full_url}>)")
-        #                     else:
-        #                         st.error(f"Failed to access the form for {brace_type} brace. Status Code: {response.status_code}")
-        #                 except Exception as e:
-        #                     st.error(f"Error accessing the form for {brace_type} brace: {e}")
-
-        #             st.success(f"{len(selected_urls)} form(s) are ready for submission. Please click the links above to submit.")
         st.title("Brace Form Submission")
 
         st.header("Patient and Doctor Information")
@@ -1389,28 +1252,6 @@ def main():
                             os.unlink(combined_pdf_filename)
                             st.success("PDFs are ready for download.")
 
-                        # for pdf_file in pdf_files:
-                        #     merger.append(pdf_file)
-
-                        # merger.write(combined_pdf_filename)
-                        # merger.close()
-
-                        # # Provide download button for the combined PDF
-                        # with open(combined_pdf_filename, "rb") as pdf_file:
-                        #     st.download_button(
-                        #         label="Download Combined Brace Forms PDF",
-                        #         data=pdf_file,
-                        #         file_name=combined_pdf_filename,
-                        #         mime="application/pdf"
-                        #     )
-
-                        # # Clean up individual PDF files and combined file
-                        # for pdf_file in pdf_files:
-                        #     os.unlink(pdf_file)
-
-                        # os.unlink(combined_pdf_filename)
-
-                        # st.success(f"{len(selected_braces)} PDF form(s) are ready for download. Please click the download button above.")
 
 
     elif page == "Send Fax":
@@ -1431,7 +1272,6 @@ def main():
                     # This placeholder just combines the files without additional processing.
                     
                     # Example: Combine the uploaded PDFs into a single file (if needed)
-                    from PyPDF2 import PdfMerger
                     merger = PdfMerger()
                     
                     for uploaded_file in uploaded_files:
