@@ -1367,73 +1367,104 @@ def on_row_select():
 
     
 def main():
+    
     # Sidebar navigation
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Form Submission", "Send Fax", "Sent Faxes List"])
-    # Adding a note in the sidebar
+    page = st.sidebar.radio("Go to", ["Braces Form Submission", "CGM Form", "Send Fax"])
+    
+    # Adding a note in the sidebar with new color
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### Ankle States → L1906")
-    st.sidebar.markdown("- AR")
-    st.sidebar.markdown("- TN")
-    st.sidebar.markdown("- MN")
-    st.sidebar.markdown("- IL")
-    st.sidebar.markdown("- NJ")
-    st.sidebar.markdown("- OH")
-    st.sidebar.markdown("- KY")
-    if page == "Form Submission":
+    st.sidebar.markdown("<h3>Ankle States → L1906</h3>", unsafe_allow_html=True)
+    states = ["AR", "TN", "MN", "IL", "NJ", "OH", "KY"]
+    for state in states:
+        st.sidebar.markdown(f"<p>- {state}</p>", unsafe_allow_html=True)
 
+    if page == "Braces Form Submission":
         st.title("Brace Form Submission")
-
-        st.header("Patient and Doctor Information")
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.subheader("Patient Information")
-            date = st.date_input("Date")
-            fname = st.text_input("First Name")
-            lname = st.text_input("Last Name")
-            ptPhone = st.text_input("Patient Phone Number")
-            ptAddress = st.text_input("Patient Address")
-            ptCity = st.text_input("Patient City")
-            ptState = st.text_input("Patient State")
-            ptZip = st.text_input("Patient Zip Code")
-            ptDob = st.text_input("Date of Birth")
-            medID = st.text_input("MBI")
-            ptHeight = st.text_input("Height")
-            ptWeight = st.text_input("Weight")
-            ptGender = st.selectbox("Gender", ["Male", "Female"])
-
-        with col2:
-            st.subheader("Doctor Information")
-            drName = st.text_input("Doctor Name")
-            drAddress = st.text_input("Doctor Address")
-            drCity = st.text_input("Doctor City")
-            drState = st.text_input("Doctor State")
-            drZip = st.text_input("Doctor Zip Code")
-            drPhone = st.text_input("Doctor Phone Number")
-            drFax = st.text_input("Doctor Fax Number")
-            drNpi = st.text_input("Doctor NPI")
-
         st.header("Select Braces")
+        brace_columns = st.columns(len(Braces))
         selected_forms = {}
+        # Create two rows of columns: 3 columns in the first row, 4 columns in the second row
         col1, col2, col3 = st.columns(3)
         col4, col5, col6, col7 = st.columns(4)
 
+        # Function to handle displaying the braces and their forms
         def display_brace(brace, column):
+            if brace not in st.session_state:
+                st.session_state[brace] = "None"
+
             with column:
                 st.subheader(f"{brace} Brace")
                 brace_options = ["None"] + list(brace_info[brace].keys())
                 selected_forms[brace] = st.radio(
                     f"Select {brace} Brace",
                     brace_options,
-                    key=brace
+                    key=brace,
+                    index=brace_options.index(st.session_state[brace])
                 )
 
+        # Display the first 3 braces in the first row
         for idx, brace in enumerate(Braces[:3]):
             display_brace(brace, [col1, col2, col3][idx])
 
+        # Display the remaining 4 braces in the second row
         for idx, brace in enumerate(Braces[3:]):
             display_brace(brace, [col4, col5, col6, col7][idx])
+        # Create containers for each section
+        with st.container():
+            st.title("Patient and Doctor Information")
+                # Row 1
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.subheader("Patient Information")
+            with col2:
+                st.subheader("Patient Metrics")
+            with col3:
+                st.subheader("Doctor Information")
+            
+            col1, col2, col3 = st.columns([1, 1, 1])  # Adjust proportions if needed
+            
+            with col1:
+                date = st.date_input("Date")
+                fname = st.text_input("First Name")
+                lname = st.text_input("Last Name")
+                ptPhone = st.text_input("Patient Phone Number")
+                ptAddress = st.text_input("Patient Address")
+                ptCity = st.text_input("Patient City")
+                ptState = st.text_input("Patient State")
+                
+            
+            with col2:
+                ptZip = st.text_input("Patient Zip Code")
+                ptDob = st.text_input("Date of Birth")
+                medID = st.text_input("MBI")
+                ptHeight = st.text_input("Height")
+                ptWeight = st.text_input("Weight")
+                ptGender = st.selectbox("Gender", ["Male", "Female"])
+
+                # Apply any desired styling here
+                # st.markdown("""
+                # <style>
+                # .css-1d391kg {
+                #     width: 100% !important;
+                # }
+                # </style>
+                # """, unsafe_allow_html=True)
+            
+            with col3:
+                
+                drName = st.text_input("Doctor Name")
+
+                drAddress = st.text_input("Doctor Address")
+                drCity = st.text_input("Doctor City")
+                drState = st.text_input("Doctor State")
+                drZip = st.text_input("Doctor Zip Code")
+                drPhone = st.text_input("Doctor Phone Number")
+                drFax = st.text_input("Doctor Fax Number")
+                drNpi = st.text_input("Doctor NPI")
+
+        # Submit Button
+        st.markdown("<br>", unsafe_allow_html=True)
 
         def validate_all_fields():
             required_fields = [
@@ -1535,22 +1566,20 @@ def main():
 
     elif page == "Send Fax":
         st.title("Send Fax")
-        st.header("Upload PDF Files to be sent")
+        
+        # Improved Subheader Design for Uploading PDFs
+        st.subheader("**Upload PDF Files to be Sent**")
+        st.markdown("You can upload multiple PDF files here. These files will be combined and processed before sending them via fax.")
 
         uploaded_files = st.file_uploader("Upload PDF Files", type="pdf", accept_multiple_files=True)
 
         if uploaded_files:
             st.write(f"Uploaded {len(uploaded_files)} file(s):")
             for uploaded_file in uploaded_files:
-                st.write(uploaded_file.name)
+                st.write(f"- {uploaded_file.name}")
                 
             if st.button("Process Uploaded PDFs"):
                 with st.spinner("Processing uploaded PDFs..."):
-                    # Here you would process the uploaded PDFs as needed.
-                    # For example, you could save them to a directory, merge them, or perform other operations.
-                    # This placeholder just combines the files without additional processing.
-                    
-                    # Example: Combine the uploaded PDFs into a single file (if needed)
                     from PyPDF2 import PdfMerger
                     merger = PdfMerger()
                     
@@ -1575,67 +1604,40 @@ def main():
                 mime="application/pdf"
             )
             st.success("Uploaded PDF(s) are ready for further processing (e.g., sending faxes).")
-        # st.header("Combine PDFs")
-        # # uploaded_cover_sheet = st.file_uploader("Upload Cover Sheet PDF (Optional)", type="pdf")
+        # Improved Subheader Design for Uploading Cover Sheet
+        st.subheader("Upload Cover Sheet :red[**(Optional)**]")
+        st.markdown("If you have a pre-prepared cover sheet, you can upload it here. Otherwise, you'll need to fill out the information below to generate one.")
 
-        # doctor_name = st.text_input("Enter Doctor Name for PDF combination")
-        # if st.button("Combine PDFs"):
-        #     if doctor_name:
-        #         with st.spinner("Combining PDFs..."):
-        #             combined_pdf, error = combine_pdfs(doctor_name)
-        #             if error:
-        #                 st.error(f"Error combining PDFs: {error}")
-        #             elif combined_pdf:
-        #                 st.success(f"Combined PDF for {doctor_name} created successfully.")
-        #                 st.session_state['combined_pdf'] = combined_pdf
-        #                 st.session_state['doctor_name'] = doctor_name
-        #                 st.experimental_rerun()
-        #             else:
-        #                 st.error("Failed to create combined PDF. Please try again.")
-        #     else:
-        #         st.warning("Please enter a doctor name for PDF combination.")
+        uploaded_cover_sheet = st.file_uploader("Upload Cover Sheet", type="pdf")
+        # Improved Subheader Design for Fax Service Selection
+        st.subheader("**Select Fax Service**")
 
-        # if 'combined_pdf' in st.session_state:
-        #     st.download_button(
-        #         label="Download Combined PDF",
-        #         data=st.session_state['combined_pdf'].getvalue(),
-        #         file_name=f"{st.session_state['doctor_name']}_combined.pdf",
-        #         mime="application/pdf"
-        #     )
-        #     st.success("Combined PDF is ready for further processing (e.g., sending faxes).")
-
-
-        st.subheader("Select Fax Service")
         fax_service = st.radio(
             "Choose a fax service:",
-            ["SRFax", "HumbleFax",  "FaxPlus"],
+            ["SRFax", "HumbleFax", "FaxPlus"],
             horizontal=True
         )
-        # # Receiver number input
-        # receiver_number = st.text_input("Receiver Fax Number")
 
-        # # Common fax inputs
-        # fax_message = st.text_area("Fax Message")
-        # fax_subject = st.text_input("Fax Subject")
-        # to_name = st.text_input("To (Recipient Name)")
-        # chaser_name = st.selectbox("From (Sender Name)", list(chasers_dict.keys()))
-        
-        uploaded_cover_sheet = st.file_uploader("Upload Cover Sheet (Optional)", type="pdf")
+
+        receiver_number = st.text_input("Receiver Fax Number")
+
         if fax_service == "SRFax":
-            user = st.text_input("Fax user")
-            password = st.text_input("Fax Password")
-            
+            st.subheader(":red[**Enter SRFax Credentials**]")
+            st.markdown("If you don't have an account, you can leave these fields empty. Otherwise, please provide your SRFax login credentials.")
+
+            user = st.text_input("Fax User")
+            password = st.text_input("Fax Password", type="password")
+
         if not uploaded_cover_sheet:
-            # Fields required if no cover sheet is uploaded
-            receiver_number = st.text_input("Receiver Fax Number")
+            st.subheader(":blue[**Fill Out Cover Sheet Information**]")
+            st.markdown("Since you haven't uploaded a cover sheet, please provide the following information to generate one.")
+
             fax_message = st.text_area("Fax Message")
             fax_subject = st.text_input("Fax Subject")
             to_name = st.text_input("To (Recipient Name)")
             chaser_name = st.selectbox("From (Sender Name)", list(chasers_dict.keys()))
 
         else:
-            # If a cover sheet is uploaded, skip additional input fields
-            receiver_number = None
             fax_message = None
             fax_subject = None
             to_name = None
@@ -1651,7 +1653,10 @@ def main():
             else:
                 combined_pdf = st.session_state.get('uploaded_pdfs')
                 chaser_number = chasers_dict.get(chaser_name, "")
+                
                 chaser_email = chasers_emails.get(chaser_name, "")
+                if chaser_name=="INCALL":
+                    chaser_email = st.text_input("Enter Your Email")
                 fax_message_with_number = f"{fax_message}<br><br><b>From: {chaser_name}</b><br><b>Phone: {chaser_number}<b><br><b>Email: {chaser_email}<b>" if fax_message else ""
                 
                 if fax_service == "SRFax":
