@@ -29,7 +29,13 @@ import logging
 import html
 from google.auth.transport.requests import Request
 from pyhtml2pdf import converter
-from weasyprint import HTML
+import random
+
+def get_brace_type(brace_code):
+    for brace_type, brace_data in brace_info.items():
+        if brace_code in brace_data:
+            return brace_type
+    return "Unknown"  # Return this if no matching brace type is found
 
 
 style = """
@@ -96,72 +102,67 @@ html_code = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prior Authorization Prescription Request Form</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.4; font-size: 12px; width: 210mm; height: 297mm; margin: 0 auto; padding: 15mm 10mm; box-sizing: border-box;">
+<body style="font-family: Arial, sans-serif; line-height: 1.4; font-size: 12px; width: 210mm; height: 297mm; margin: 0; padding: 10mm 10mm 15mm; box-sizing: border-box;">
+
     <div style="text-align: center; margin-bottom: 15px;">
-        <h2 style="font-size: 14px; margin: 0 0 10px; font-weight: bold;">PRIOR AUTHORIZATION PRESCRIPTION REQUEST FORM FOR BACK ORTHOSIS</h2>
+        <h2 style="font-size: 14px; margin: 0 0 10px; font-weight: bold;">PRIOR AUTHORIZATION PRESCRIPTION REQUEST FORM FOR {brace_type} ORTHOSIS</h2>
         <p style="margin: 0; font-size: 10px; font-weight: bold;">PLEASE SEND THIS FORM BACK IN 3 BUSINESS DAYS</p>
         <p style="margin: 0; font-size: 10px;font-weight: bold;">WITH THE PT CHART NOTES (RECENT MEDICAL RECORDS) AND THE FAX COVER SHEET</p>
     </div>
 
     <div style="display: flex; margin-top: 15px;">
-        <div style="width: 48%; border: 1px solid black; padding: 10px; box-sizing: border-box;"> <!-- Adjusted padding -->
+        <div style="width: 48%; border: 1px solid black; padding: 5px; box-sizing: border-box;"> <!-- Reduced padding -->
             <div style="display: flex; justify-content: space-between;">
                 <div style="width: 48%;">
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Date:</span> {date}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">First:</span> {fname}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">DOB:</span> {dob}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Address:</span> {address}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">City:</span> {city}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">State:</span> {state}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Postal Code:</span> {zip}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Patient Phone:</span> {phone}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Primary Ins:</span> Medicare</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Weight:</span> {weight}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Date:</span> {date}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">First:</span> {fname}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">DOB:</span> {dob}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Address:</span> {address}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">City:</span> {city}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">State:</span> {state}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Postal Code:</span> {zip}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Patient Phone:</span> {phone}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Primary Ins:</span> Medicare</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Weight:</span> {weight}</div>
                 </div>
                 <div style="width: 48%;">
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Last:</span> {lname}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Gender:</span> {gender}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">&nbsp;</span></div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Policy #:</span> {medID}</div>
-                    <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Height:</span> {height}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Last:</span> {lname}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Gender:</span> {gender}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">&nbsp;</span></div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Policy #:</span> {medID}</div>
+                    <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Height:</span> {height}</div>
                 </div>
             </div>
         </div>
-        <div style="width: 48%; border: 1px solid black; padding: 10px; box-sizing: border-box;"> <!-- Adjusted padding -->
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Physician Name:</span> {doctor_name}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">NPI:</span> {doctor_npi}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Address:</span> {doctor_address}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">City:</span> {doctor_city}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">State:</span> {doctor_state}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Postal Code:</span> {doctor_zip}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Phone Number:</span> {doctor_phone}</div>
-            <div style="margin-bottom: 8px;"><span style="font-weight: bold;">Fax Number:</span> {doctor_fax}</div>
+        <div style="width: 48%; border: 1px solid black; padding: 5px; box-sizing: border-box;"> <!-- Reduced padding -->
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Physician Name:</span> {doctor_name}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">NPI:</span> {doctor_npi}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Address:</span> {doctor_address}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">City:</span> {doctor_city}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">State:</span> {doctor_state}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Postal Code:</span> {doctor_zip}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Phone Number:</span> {doctor_phone}</div>
+            <div style="margin-bottom: 4px;"><span style="font-weight: bold;">Fax Number:</span> {doctor_fax}</div>
         </div>
     </div>
+
     <div style="display: grid; gap: 3px; font-size: 8px;"> <!-- Reduced gap between checkboxes -->
         This patient is being treated under a comprehensive plan of care for lance pain.
 I, the undersigned, certify that the prescribed orthosis is medically necessary for the patient’s overall well-being. In my opinion, the following lance orthosis products are both reasonable and necessary in reference to treatment of the patient ’s condition and/or rehabilitation. My patient has been in care regarding the diagnosis below. This is the treatment I see fit for this patient at this time. I certify that this information is true and correct.
     </div>
     <div style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;">DIAGNOSIS: Provider can specify all of the diagnoses they feel are appropriate</div>
-
-    <div style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;">DIAGNOSIS: Provider can specify all of the diagnoses they feel are appropriate</div>
     <div style="display: grid; gap: 6px;"> <!-- Reduced gap between checkboxes -->
-        <div><input type="checkbox" style="margin-right: 5px;">Lumbar Intervertebral Disc Degeneration (M51.36)</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Other intervertebral disc displacement, lumbar region (M51.26)</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Spinal Stenosis, lumbar region (M48.06)</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Spinal instability, lumbosacral region (M53.2X7)</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Other intervertebral disc disorders, lumbosacral region (M51.87)</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Low back pain (M54.5)</div>
+        {diagnosis}
     </div>
 
 
         <div style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;">AFFECTED AREA</div>
-        <div><input type="checkbox" style="margin-right: 5px;">Back</div>
+        {affected_areas}
 
         <p style="margin-top: 15px;">Our evaluation of the above patient has determined that providing the following Back orthosis products will benefit this patient.</p>
 
@@ -188,13 +189,146 @@ I, the undersigned, certify that the prescribed orthosis is medically necessary 
     </body>
     </html>
     """
-def generate_pdf(html_content, filename):
-    HTML(string=html_content).write_pdf(filename)
+def get_affected_areas(brace_code):
+    if brace_code in ['L0457-G', 'L0637']:
+        return '<div style="margin-bottom: 5px;"><input type="checkbox" class="custom-checkbox" checked>Back</div>'
+    elif brace_code in ['L1845', 'L1852-G', 'L1843']:
+        return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Knee</div>' \
+               '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Knee</div>'
+    elif brace_code == 'L3761':
+        return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Elbow</div>' \
+               '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Elbow</div>'
+    elif brace_code == 'L3960':
+        return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Shoulder</div>' \
+               '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Shoulder</div>'
+    elif brace_code in ['L1971', 'L1906']:
+        return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Ankle</div>' \
+               '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Ankle</div>'
+    elif brace_code == 'L3916':
+        return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Wrist</div>' \
+               '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Wrist</div>'
+    elif brace_code == 'L0174':
+        return '<div style="margin-bottom: 5px;"><input type="checkbox" class="custom-checkbox" checked>Neck</div>'
+    # Add other conditions for different brace codes
+    else:
+        return ''  # Default case if no match
+
+
+# PDFShift API request
+def pdfshift_request(api_key, html_body):
+    response = requests.post(
+        'https://api.pdfshift.io/v3/convert/pdf',
+        auth=('api', api_key),
+        json={
+            "source": html_body,
+            "landscape": False,
+            "use_print": False
+        }
+    )
+    return response
+
+# html2pdf.app API request
+def html2pdf_request(api_key, html_body, document_url=None):
+    data = {
+        "apiKey": api_key,
+        "html": html_body,
+        "permissions": ["print", "modify", "copy"]
+    }
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(
+        url="https://api.html2pdf.app/v1/generate", headers=headers, json=data
+    )
+    return response
+
+# RapidAPI html2pdf API request
+def html2pdf_rapidapi(api_key, html_body, document_url=None):
+    url = "https://html2pdf2.p.rapidapi.com/html2pdf"
+    payload = {"html": html_body}
+    headers = {
+        "x-rapidapi-key": api_key,
+        "x-rapidapi-host": "html2pdf2.p.rapidapi.com",
+        "Content-Type": "application/json"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    return response
+
+# Function to create a download link
+def create_download_link(content, filename):
+    if isinstance(content, bytes):
+        # If content is binary, assume it's PDF data that needs to be base64 encoded
+        b64 = base64.b64encode(content).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}.pdf">Download PDF</a>'
+    elif isinstance(content, str):
+        # If content is a string, assume it's a URL
+        href = f'<a href="{content}" download="{filename}.pdf">Download PDF</a>'
+    else:
+        raise ValueError("Content type not supported for download link.")
+    return href
+
+# Load API keys from secrets
+html2pdf_apis = st.secrets["html2pdf_apis"]
+pdfshift_apis = st.secrets["pdfshift_apis"]
+rapidapi_html2pdf = st.secrets["rapidapi_html2pdf"]
+
+# Combine all API keys into a single list with corresponding API type
+all_api_keys = [
+    ("html2pdf_apis", key) for key in html2pdf_apis.values()
+] + [
+    ("pdfshift_apis", key) for key in pdfshift_apis.values()
+] + [
+    ("rapidapi_html2pdf", key) for key in rapidapi_html2pdf.values()
+]
+
+def generate_pdf(html_body):
+    api_type, api_key = random.choice(all_api_keys)
+    
+    if api_type == "html2pdf_apis":
+        response = html2pdf_request(api_key, html_body)
+    elif api_type == "pdfshift_apis":
+        response = pdfshift_request(api_key, html_body)
+    elif api_type == "rapidapi_html2pdf":
+        response = html2pdf_rapidapi(api_key, html_body)
+    else:
+        st.error("API key not recognized")
+        return None
+    
+    # Handle the response
+    if response.status_code == 200:
+        content_type = response.headers.get('Content-Type', '')
+        
+        if 'application/json' in content_type:
+            try:
+                json_response = response.json()
+                if 'pdf' in json_response:
+                    pdf_content = base64.b64decode(json_response['pdf'])
+                    html = create_download_link(pdf_content, "result")
+                elif 'url' in json_response:
+                    pdf_url = json_response['url']
+                    html = create_download_link(pdf_url, "result")
+                else:
+                    st.error(f"Unexpected JSON response format: {json_response}")
+                    return None
+            except json.JSONDecodeError:
+                st.error(f"Invalid JSON response: {response.text}")
+                return None
+        elif 'application/pdf' in content_type:
+            pdf_content = response.content
+            html = create_download_link(pdf_content, "result")
+        else:
+            st.error(f"Unexpected content type: {content_type}")
+            return None
+        
+        st.markdown(html, unsafe_allow_html=True)
+    else:
+        st.error(f"Error generating PDF: {response.status_code} - {response.text}")
+        return None
+
 
 def merge_pdfs(pdf_files):
-    from PyPDF2 import PdfMerger
-
+    # Initialize the merger object
     merger = PdfMerger()
+
+    # Combine all generated PDFs into a single PDF
     combined_pdf_filename = f"combined_brace_forms_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
 
     for pdf_file in pdf_files:
@@ -203,7 +337,24 @@ def merge_pdfs(pdf_files):
     merger.write(combined_pdf_filename)
     merger.close()
 
-    return combined_pdf_filename
+    # Provide download button for the combined PDF
+    with open(combined_pdf_filename, "rb") as pdf_file:
+        st.download_button(
+            label="Download Combined Brace Forms PDF",
+            data=pdf_file,
+            file_name=combined_pdf_filename,
+            mime="application/pdf"
+        )
+
+    # Clean up individual PDF files and combined file
+    for pdf_file in pdf_files:
+        os.unlink(pdf_file)
+
+    os.unlink(combined_pdf_filename)
+
+    st.success(f"{len(pdf_files)} PDF form(s) are ready for download. Please click the download button above.")
+
+
 def generate_cover_page_html(chaser_name, to_name, fax_subject, fax_message, date, sender_email, receiver_number ):
     html_body = f"""
 <!DOCTYPE html>
@@ -270,29 +421,166 @@ def generate_cover_page_html(chaser_name, to_name, fax_subject, fax_message, dat
 Braces = ["Back", "Knees", "Elbow", "Shoulder", "Ankle", "Wrists", "Neck"]
 brace_info = {
     "Back": {
-        'L0637': "LUMBAR ORTHOSIS, SAGITTAL-CORONAL CONTROL, WITH RIGID ANTERIOR AND POSTERIOR PANELS, POSTERIOR EXTENDS FROM SACROCOCCYGEAL JUNCTION TO T-9 VERTEBRA, PRODUCES INTRACAVITARY PRESSURE TO REDUCE LOAD ON THE INTERVERTEBRAL DISCS, INCLUDES STRAPS, CLOSURES, MAY INCLUDE PADDING, SHOULDER STRAPS, PENDULOUS ABDOMEN DESIGN, PREFABRICATED, INCLUDES FITTING AND ADJUSTMENT",
-        'L0457-G': "TLSO, FLEXIBLE, PROVIDES TRUNK SUPPORT, THORACIC REGION, RIGID POSTERIOR PANEL AND SOFT ANTERIOR APRON, EXTENDS FROM THE SACROCOCCYGEAL JUNCTION AND TERMINATES JUST INFERIOR TO THE SCAPULAR SPINE, RESTRICTS GROSS TRUNK MOTION IN THE SAGITTAL PLANE, PRODUCES INTRACAVITARY PRESSURE TO REDUCE LOAD ON THE INTERVERTEBRAL DISCS, INCLUDES STRAPS AND CLOSURES, PREFABRICATED, INCLUDES FITTING AND ADJUSTMENT"
+        'L0637': [
+            "LUMBAR ORTHOSIS, SAGITTAL-CORONAL CONTROL, WITH RIGID ANTERIOR AND POSTERIOR PANELS, POSTERIOR EXTENDS FROM SACROCOCCYGEAL JUNCTION TO T-9 VERTEBRA, PRODUCES INTRACAVITARY PRESSURE TO REDUCE LOAD ON THE INTERVERTEBRAL DISCS, INCLUDES STRAPS, CLOSURES, MAY INCLUDE PADDING, SHOULDER STRAPS, PENDULOUS ABDOMEN DESIGN, PREFABRICATED, INCLUDES FITTING AND ADJUSTMENT",
+            "Lumbar Intervertebral Disc Degeneration (M51.36)",
+            "Other intervertebral disc displacement, lumbar region (M51.26)",
+            "Spinal Stenosis, lumbar region (M48.06)",
+            "Spinal instability, lumbosacral region (M53.2X7)",
+            "Other intervertebral disc disorders, lumbosacral region (M51.87)",
+            "Low back pain (M54.5)"
+        ],
+        'L0457-G': [
+            "lumbar-Sacral Orthosis, Sagittal-Coronal Control, With Rigid Anterior And Posterior Frame/Panel(S), Posterior Extends From Sacrococcygeal Junction To 7-9 Vertebra, Lateral Strength Provided By Rigid Lateral Frame/Panel(S), Produces Intracavitary Pressure To Reduce Load On Intervertebral Discs, Includes Straps, Closures, May Include Padding Shoulder Straps, Pendulous Abdomen Design, Prefabricated, Off-The-Shelf.",
+            "Lumbar Intervertebral Disc Degeneration (M51.36)",
+            "Other intervertebral disc degeneration, lumbosacral region (M51.37)",
+            "Spinal Stenosis, lumbar region (M48.06)",
+            "Spinal stenosis, lumbosacral region (M48.07)",
+            "Other Intervertebral disc disorders, lumbosacral region (M51.87)",
+            "Low back pain (M54.5)"
+        ],
+        'L0651-G': [
+            "Lumbar/ Lumbosacral Intervertebral Disc Degeneration (M51.36)",
+            "Other intervertebral disc degeneration, lumbosacral region (M51.37)",
+            "Spinal Stenosis, lumbar region (M48.06)",
+            "Spinal stenosis, lumbosacral region (M48.07)",
+            "Other Intervertebral disc disorders, lumbosacral region (M51.87)",
+            "Low back pain (M54.5)"
+        ]
     },
     "Knees": {
-        'L1843': '',
-        'L1852-G': '',
-        'L1845': ''
+        'L1843': ['Knee orthosis, double upright, thigh and calf, with adjustable flexion and extension joint (unicentric or    polycentric), medial-lateral and rotation control, with or without varus/valgus adjustment, prefabricated item that has been trimmed, bent, molded, assembled, or otherwise customized to fit a specific patient by an individual with expertise; includes L2397 Suspension Sleeve.',
+                    "Hypermobility Syndrome (M35.7) (check below that apply)",
+                    "Grade < 2mm Tight with firm end-feel",
+                    " Grade I 3-5mm Nominal increase in laxity compared to contralateral knee.",
+                    "Grade II 6-9mm Slight increase in anterior translation compared to contralateral knee.",
+                    "Grade III > 10mm Excessive anterior translation compared to contralateral knee.",
+                    "Other spontaneous disruption of anterior cruciate ligament of unspecified knee. (M23.619) (check below)",
+                    "Pivot Shift Normal Knee Grace I Grade II Grade III",
+                    "Medial Plateau 3mm 5mm 10mm 15mm",
+                    "Lateral Plateau 5mm 12mm 18mm 22mm",
+                    "Chronic instability of knee, right knee (M23.51)",
+                    "Chronic instability of knee, left knee (M23.52)",
+                    "Other /Explain: " ],
+        'L1852-G': ['Knee orthosis, double upright, thigh and calf, with adjustable flexion and extension joint (unicentric or    polycentric), medial-lateral and rotation control, with or without varus/valgus adjustment, prefabricated item that has been trimmed, bent, molded, assembled, or otherwise customized to fit a specific patient by an individual with expertise; includes L2397 Suspension Sleeve.',
+                    "Hypermobility Syndrome (M35.7) (check below that apply)",
+                    "Grade < 2mm Tight with firm end-feel",
+                    " Grade I 3-5mm Nominal increase in laxity compared to contralateral knee.",
+                    "Grade II 6-9mm Slight increase in anterior translation compared to contralateral knee.",
+                    "Grade III > 10mm Excessive anterior translation compared to contralateral knee.",
+                    "Other spontaneous disruption of anterior cruciate ligament of unspecified knee. (M23.619) (check below)",
+                    "Pivot Shift Normal Knee Grace I Grade II Grade III",
+                    "Medial Plateau 3mm 5mm 10mm 15mm",
+                    "Lateral Plateau 5mm 12mm 18mm 22mm",
+                    "Chronic instability of knee, right knee (M23.51)",
+                    "Chronic instability of knee, left knee (M23.52)",
+                    "Other /Explain: "  
+            ],
+        'L1833-G': [' KNEE ORTHOSIS, ADJUSTABLE KNEE JOINTS (UNICENTRIC OR POLYCENTRIC), POSITIONAL ORTHOSIS, RIGID SUPPORT, PREFABRICATED, OFF-THE SHELF. includes L2397 Suspension Sleeve',
+                    "Hypermobility Syndrome (M35.7) (check below that apply)",
+                    "Grade < 2mm Tight with firm end-feel",
+                    " Grade I 3-5mm Nominal increase in laxity compared to contralateral knee.",
+                    "Grade II 6-9mm Slight increase in anterior translation compared to contralateral knee.",
+                    "Grade III > 10mm Excessive anterior translation compared to contralateral knee.",
+                    "Other spontaneous disruption of anterior cruciate ligament of unspecified knee. (M23.619) (check below)",
+                    "Pivot Shift Normal Knee Grace I Grade II Grade III",
+                    "Medial Plateau 3mm 5mm 10mm 15mm",
+                    "Lateral Plateau 5mm 12mm 18mm 22mm",
+                    "Chronic instability of knee, right knee (M23.51)",
+                    "Chronic instability of knee, left knee (M23.52)",
+                    "Other /Explain: "]
     },
     "Elbow": {
-        'L3761': ''
+        'L3761': ['Elbow orthosis (eo), with adjustable position locking joint(s), prefabricated, off-the-shelf',
+                "Cubital Tunnel Syndrome (G56.2)",
+                "Rheumatoid bursitis, right elbow (M06.221)",
+                "Rheumatoid bursitis, left elbow (M06.222)",
+                "Pain in right elbow (M25.521)",
+                "Pain in left elbow (M25.522)",
+                "Unspecified sprain of right elbow (S53.401)", 
+                "Unspecified sprain of left elbow (S53.402)",
+                "Disorder of ligament, right elbow (M24.221)",
+                "Disorder of ligament, left elbow (M24.222)",
+]
     },
     "Shoulder": {
-        'L3960': ''
+        'L3960': ['Shoulder elbow wrist hand orthosis, abduction positioning, airplane design, prefabricated, includes fitting and adjustment',
+                  "M75.31 Calcific tendinitis of left shoulder",
+                    "M75.32 Calcific tendinitis of right shoulder",
+                    "M75.41 Impingement syndrome of left shoulder", 
+                    "M75.42 Impingement syndrome of right shoulder", 
+                    "G56.11 Other lesions of median nerve, right upper limb", 
+                    "G56.12 Other lesions of median nerve, left upper limb", 
+                    "G56.31 Lesion of radial nerve, right upper limb", 
+                    "G56.32 Lesion of radial nerve, left upper limb", 
+                    "M25.511 Pain in right Shoulder",
+                    "M25.512 Pain in Left Shoulder"
+                  ],
+        'L3660-G': ['Shoulder elbow wrist hand orthosis, abduction positioning, airplane design, prefabricated, includes fitting and adjustment',
+                  "M75.31 Calcific tendinitis of left shoulder",
+                    "M75.32 Calcific tendinitis of right shoulder",
+                    "M75.41 Impingement syndrome of left shoulder", 
+                    "M75.42 Impingement syndrome of right shoulder", 
+                    "G56.11 Other lesions of median nerve, right upper limb", 
+                    "G56.12 Other lesions of median nerve, left upper limb", 
+                    "G56.31 Lesion of radial nerve, right upper limb", 
+                    "G56.32 Lesion of radial nerve, left upper limb", 
+                    "M25.511 Pain in right Shoulder",
+                    "M25.512 Pain in Left Shoulder"
+                  ]
     },
     "Ankle": {
-        'L1971': '',
-        "L1906":""
+        'L1971': ['Ankle foot orthosis, plastic or other material with ankle joint, prefabricated, includes fitting and adjustment',
+                  "Primary osteoarthritis, right ankle and foot (M19.071)",
+                    "Primary osteoarthritis, left ankle and foot (M19.072)", 
+                    "Unspecified disorder of synovium and tendon, unspecified site (M67.90)",
+                    "Other instability, right ankle and foot (M25.371)",
+                    "Other instability, left ankle and foot (M25.372)", 
+                    "Displaced trimalleolar fracture of unspecified lower leg (S82.853A)",
+                    "Spontaneous rupture of other tendons, unspecified ankle and foot (M66.879)",
+                    "Pain in right ankle and joints of right foot (M25.571)",
+                    "Pain in left ankle and joints of left foot (M25.572)",
+                    "Flat foot [pes planus] (acquired), unspecified foot (M21.40)",
+                    "Sprain of unspecified ligament of right ankle (S93.401)",
+                    "Sprain of unspecified ligament of left ankle (S93.402)",
+                  ],
+        "L1906": [ "Ankle/Foot Orthosis, Plastic or other material w/Ankle Joint, PREFABRICATED. INCLUDES FITTING & ADJUSTMENT.  OFF-THE-SHELF",
+"Primary osteoarthritis, right ankle and foot (M19.071)",
+ "Primary osteoarthritis, left ankle and foot (M19.072)" ,
+ "Unspecified disorder of synovium and tendon, unspecified site (M67.90)",
+ "Other instability, right ankle and foot (M25.371)",
+ "Other instability, left ankle and foot (M25.372) ",
+"Displaced trimalleolar fracture of unspecified lower leg (S82.853A)",
+ "Spontaneous rupture of other tendons, unspecified ankle and foot (M66.879)" ,
+"Pain in right ankle and joints of right foot (M25.571)",
+ "Pain in left ankle and joints of left foot (M25.572)",
+ "Flat foot [pes planus] (acquired), unspecified foot (M21.40)" ,
+ "Sprain of unspecified ligament of right ankle (S93.401)",
+ "Sprain of unspecified ligament of left ankle (S93.402)"]
     },
     "Wrists": {
-        'L3916': ''
+        'L3916': ['Wrist hand orthosis, includes one or more nontorsion joint(s), elastic bands, turnbuckles, may include soft interface, straps, prefabricated, off-the-shelf',
+                  "Primary Osteoarthritis, Right wrist (M19.031)",
+                    "Primary Osteoarthritis, Left wrist (M19.032)",
+                    "Primary Osteoarthritis, Right Hand (M19.41)",
+                    "Primary Osteoarthritis, Left Hand (M19.42)",
+                    "Carpal Tunnel Syndrome, Right Upper Limb (G56.01)",
+                    "Pain In Right Wrist (M25.531)", 
+                    "Carpal Tunnel Syndrome, Left Upper Limb (G56.02)",
+                    "Pain In Left Wrist (M25.532)",
+                  ]
     },
-    "Neck":{
-        "L0174" : ""
+    "Neck": {
+        "L0174": ['Cervical, collar, semi-rigid, thermoplastic foam, two piece with thoracic extension, prefabricated, off-the-shelf.',
+                  "Radirulopathy, Cervical Region (M54.12)", 
+                    "Radiculopathy, Cervical Thoracic Region (M54.13)", 
+                    "Radiculapathy, Occipito -Atlanto-Axial Regio (M54.11)", 
+                    "Cervicalgia (M54.2)", 
+                    "Cervical disc disorder with myelopathy, High Cervical Region (M50.01)", 
+                    "Spinal stenosis, Cervical region (M48.02)",
+                    "Other/Explain (Include Code) :",
+
+                  ]
     }
 }
 
@@ -1101,136 +1389,7 @@ def main():
     st.sidebar.markdown("- OH")
     st.sidebar.markdown("- KY")
     if page == "Form Submission":
-        # st.title("Brace Form Submission")
-        
-        # st.header("Patient and Doctor Information")
-        # col1, col2 = st.columns(2)
-        
-        # with col1:
-        #     st.subheader("Patient Information")
-        #     date = st.date_input("Date")
-        #     fname = st.text_input("First Name")
-        #     lname = st.text_input("Last Name")
-        #     ptPhone = st.text_input("Patient Phone Number")
-        #     ptAddress = st.text_input("Patient Address")
-        #     ptCity = st.text_input("Patient City")
-        #     ptState = st.text_input("Patient State")
-        #     ptZip = st.text_input("Patient Zip Code")
-        #     ptDob = st.text_input("Date of Birth")
-        #     medID = st.text_input("MBI")
-        #     ptHeight = st.text_input("Height")
-        #     ptWeight = st.text_input("Weight")
-        #     ptGender = st.selectbox("Gender", ["Male", "Female"])
 
-        # with col2:
-        #     st.subheader("Doctor Information")
-        #     drName = st.text_input("Doctor Name")
-        #     drAddress = st.text_input("Doctor Address")
-        #     drCity = st.text_input("Doctor City")
-        #     drState = st.text_input("Doctor State")
-        #     drZip = st.text_input("Doctor Zip Code")
-        #     drPhone = st.text_input("Doctor Phone Number")
-        #     drFax = st.text_input("Doctor Fax Number")
-        #     drNpi = st.text_input("Doctor NPI")
-
-        # st.header("Select Braces")
-        # brace_columns = st.columns(len(Braces))
-        # selected_forms = {}
-        # # Create two rows of columns: 3 columns in the first row, 4 columns in the second row
-        # col1, col2, col3 = st.columns(3)
-        # col4, col5, col6, col7 = st.columns(4)
-
-        # # Function to handle displaying the braces and their forms
-        # def display_brace(brace, column):
-        #     if brace not in st.session_state:
-        #         st.session_state[brace] = "None"
-
-        #     with column:
-        #         st.subheader(f"{brace} Brace")
-        #         brace_options = ["None"] + list(BracesForms[brace].keys())
-        #         selected_forms[brace] = st.radio(
-        #             f"Select {brace} Brace",
-        #             brace_options,
-        #             key=brace,
-        #             index=brace_options.index(st.session_state[brace])
-        #         )
-
-        # # Display the first 3 braces in the first row
-        # for idx, brace in enumerate(Braces[:3]):
-        #     display_brace(brace, [col1, col2, col3][idx])
-
-        # # Display the remaining 4 braces in the second row
-        # for idx, brace in enumerate(Braces[3:]):
-        #     display_brace(brace, [col4, col5, col6, col7][idx])
-
-        # def validate_all_fields():
-        #     required_fields = [
-        #         fname, lname, ptPhone, ptAddress,
-        #         ptCity, ptState, ptZip, ptDob, medID,
-        #         ptHeight, ptWeight, drName,
-        #         drAddress, drCity, drState, drZip,
-        #         drPhone, drFax, drNpi
-        #     ]
-        #     for field in required_fields:
-        #         if not field:
-        #             st.warning(f"{field} is required.")
-        #             return False
-        #     return True
-
-        # if st.button("Submit"):
-        #     if not validate_all_fields():
-        #         st.warning("Please fill out all required fields.")
-        #     else:
-        #         selected_urls = []
-        #         for brace_type, brace_code in selected_forms.items():
-        #             if brace_code != "None":
-        #                 url = BracesForms[brace_type][brace_code]
-        #                 selected_urls.append((brace_type, url))
-
-        #         if not selected_urls:
-        #             st.warning("Please select at least one brace form.")
-        #         else:
-        #             for brace_type, url in selected_urls:
-        #                 form_data = {
-        #                     "entry.1545087922": date.strftime("%m/%d/%Y"),
-        #                     "entry.1992907553": fname,
-        #                     "entry.1517085063": lname,
-        #                     "entry.1178853697": ptPhone,
-        #                     "entry.478400313": ptAddress,
-        #                     "entry.1687085318": ptCity,
-        #                     "entry.1395966108": ptState,
-        #                     "entry.1319952523": ptZip,
-        #                     "entry.1553550428": ptDob,
-        #                     "entry.1122949100": medID,
-        #                     "entry.2102408689": ptHeight,
-        #                     "entry.1278616009": ptWeight,
-        #                     "entry.1322384700": ptGender,
-        #                     "entry.2090908898": drName,
-        #                     "entry.198263517": drAddress,
-        #                     "entry.1349410133": drCity,
-        #                     "entry.847367280": drState,
-        #                     "entry.1652935364": drZip,
-        #                     "entry.756850883": drPhone,
-        #                     "entry.1725680069": drFax,
-        #                     "entry.314880762": drNpi
-        #                 }
-
-        #                 encoded_data = urlencode(form_data, quote_via=quote_plus)
-        #                 full_url = f"{url}?{encoded_data}"
-                        
-        #                 # Test the URL
-        #                 try:
-        #                     response = requests.get(full_url)
-        #                     if response.status_code == 200:
-        #                         # webbrowser.open(full_url)
-
-        #                         st.write(f"[Click here to open the form for {brace_type} brace](<{full_url}>)")
-        #                     else:
-        #                         st.error(f"Failed to access the form for {brace_type} brace. Status Code: {response.status_code}")
-        #                 except Exception as e:
-        #                     st.error(f"Error accessing the form for {brace_type} brace: {e}")
-
-        #             st.success(f"{len(selected_urls)} form(s) are ready for submission. Please click the links above to submit.")
         st.title("Brace Form Submission")
 
         st.header("Patient and Doctor Information")
@@ -1306,6 +1465,7 @@ def main():
                     st.warning("Please select at least one brace.")
                 else:
                     for brace_code, brace_description in selected_braces:
+
                         patient_data = {
                             "date": date.strftime("%m/%d/%Y"),
                             "fname": fname,
@@ -1337,10 +1497,18 @@ def main():
                         pdf_files = []
 
 
-
+                        
                         # Loop through each selected brace and generate individual PDFs
                         for brace_code, brace_description in selected_braces:
+                            diagnoses = "".join(
+                                f'<div style="display: inline-block; margin-bottom: 2px; font-size: 12px;"><input type="checkbox" style="margin-right: 2px; width: 14px; height: 14px; accent-color: black;"> {diagnosis}</div>'
+                                for diagnosis in brace_description[1:]
+                            )
+
+                            affected_area = get_affected_areas(brace_code)
+
                             html_filled = html_code.format(
+                                brace_type = get_brace_type(brace_code),
                                 date=patient_data["date"],
                                 fname=patient_data["fname"],
                                 lname=patient_data["lname"],
@@ -1363,54 +1531,14 @@ def main():
                                 doctor_phone=doctor_data["phone"],
                                 doctor_fax=doctor_data["fax"],
                                 Selected_Brace=brace_code,
-                                Brace_info=brace_description
+                                Brace_info=brace_description[0],
+                                diagnosis = diagnoses,
+                                affected_areas = affected_area
                             )
-                            # Create a temporary file for the PDF
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            pdf_filename = f"brace_form_{timestamp}.pdf"
-                            generate_pdf(html_filled, pdf_filename)
-                            pdf_files.append(pdf_filename)
 
-                            # Merge PDFs if multiple are generated
-                            combined_pdf_filename = merge_pdfs(pdf_files)
+                            generate_pdf(html_filled)  # Call the function to generate PDF
 
-                            with open(combined_pdf_filename, "rb") as pdf_file:
-                                st.download_button(
-                                    label="Download Combined Brace Forms PDF",
-                                    data=pdf_file,
-                                    file_name=combined_pdf_filename,
-                                    mime="application/pdf"
-                                )
 
-                            # Clean up
-                            for pdf_file in pdf_files:
-                                os.unlink(pdf_file)
-
-                            os.unlink(combined_pdf_filename)
-                            st.success("PDFs are ready for download.")
-
-                        # for pdf_file in pdf_files:
-                        #     merger.append(pdf_file)
-
-                        # merger.write(combined_pdf_filename)
-                        # merger.close()
-
-                        # # Provide download button for the combined PDF
-                        # with open(combined_pdf_filename, "rb") as pdf_file:
-                        #     st.download_button(
-                        #         label="Download Combined Brace Forms PDF",
-                        #         data=pdf_file,
-                        #         file_name=combined_pdf_filename,
-                        #         mime="application/pdf"
-                        #     )
-
-                        # # Clean up individual PDF files and combined file
-                        # for pdf_file in pdf_files:
-                        #     os.unlink(pdf_file)
-
-                        # os.unlink(combined_pdf_filename)
-
-                        # st.success(f"{len(selected_braces)} PDF form(s) are ready for download. Please click the download button above.")
 
 
     elif page == "Send Fax":
