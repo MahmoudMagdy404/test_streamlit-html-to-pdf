@@ -21,6 +21,259 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import logging
 import random
+cgm_html = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 40px;
+            padding: 20px;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: blue; margin: 0; }
+        .logo { font-weight: bold; text-align: right; }
+        .instructions { font-size: 10px; }
+        .patient-info, .diagnosis, .insulin-regimen, .order-detail { margin-bottom: 10px; }
+        .order-detail table { width: 100%; border-collapse: collapse; }
+        .order-detail th, .order-detail td { border: 1px solid black; padding: 5px; }
+        .signature-line { border-top: 1px solid black; width: 200px; margin-top: 20px; }
+        .small-print { font-size: 8px; }
+        .container { width: 80%; margin: 0 auto; }
+        .checkbox-list { list-style-type: none; padding-left: 0; }
+        .checkbox-list li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- Page 1 -->
+    <div class="header">
+        <h1>Standard Written Order <span style="font-size: 24px;">🦋</span><br>for Continuous Glucose Monitoring and Supplies</h1>
+        <div class="logo">FreeStyle<br>Libre 2</div>
+    </div>
+
+    <div class="instructions">
+        <h3>Instructions</h3>
+        <ol>
+            <li>Complete all fields on this Standard Written Order.</li>
+            <li>For Medicare: Use the National Clinician Resource Letter (Continuous Glucose Monitors) to confirm coverage criteria and medical necessity documentation requirements are met*.</li>
+            <li>Fax both this order and the patient's most recent medical records that demonstrate coverage criteria are met by a DME supplier that provides the FreeStyle Libre 2 system.</li>
+        </ol>
+    </div>
+
+    <div class="patient-info">
+        <h3>Patient Information</h3>
+        <p>Patient Name: ${patient_name}     Date of Birth: ${date_of_birth}</p>
+        <p>Phone: ${phone_number}     Email: ${email}</p>
+        <p>Address: ${address}  City: ${city} State: ${state} ZIP: ${zip_code}</p>
+        <p>Primary Insurance: ${primary_insurance} Primary Insurance Member ID: ${primary_insurance_id}</p>
+        <p>Secondary Insurance: ${secondary_insurance} Secondary Insurance Member ID: ${secondary_insurance_id}</p>
+        <p>Notes: ${notes}</p>
+    </div>
+
+    <div class="diagnosis">
+        <h3>Diagnosis (ICD10) Per Provider:</h3>
+        <input type="checkbox"> E10.9   <input type="checkbox"> E11.65   <input type="checkbox"> E10.65   <input type="checkbox"> E11.8   <input type="checkbox"> E11.9   <input type="checkbox"> Other: ________
+    </div>
+
+    <div class="insulin-regimen">
+        <h3>Current Insulin Regimen:</h3>
+        <input type="checkbox" checked> Insulin Pump   <input type="checkbox"> Multiple Daily Injections -Number Per Day: ________   <input type="checkbox"> Other: ________
+    </div>
+
+    <div class="order-detail">
+        <h3>Order Detail</h3>
+        <table>
+            <tr>
+                <th>FreeStyle Libre 2 Reader E2103</th>
+                <th>FreeStyle Libre 2 Sensors A4239</th>
+            </tr>
+            <tr>
+                <td>
+                    Use per manufacturer guidelines and/or provide further detail here:<br><br>
+                    Duration of need: Lifetime - unless specified otherwise:
+                </td>
+                <td>
+                    Change Sensor every 14 days<br>
+                    Dispense up to 90 day supply<br>
+                    Duration of need: Lifetime - unless specified otherwise:
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="background-color: black; color: white; text-align: center; padding: 5px;">
+        DISPENSE AS WRITTEN
+    </div>
+
+    <p>I certify that I am the physician identified in the "Physician Information" section below and hereby attest that the medical necessity information on this form is true, accurate and complete, to the best of my knowledge. I understand that any falsification, omission, or concealment of material fact may subject me to administrative, civil, or criminal liability. The patient/caregiver is capable and has successfully completed or will be trained on the proper use of the products prescribed on this order.</p>
+
+    <div class="signature-line"></div>
+    <p>Physician Signature: ___________________________ Date: ______________</p>
+
+    <div class="physician-info">
+        <h3>Physician Information</h3>
+        <p>Physician Name: ${physician_name}   Phone: ${physician_phone}</p>
+        <p>NPI: ${npi}   Fax: ${fax}</p>
+        <p>Address: ${physician_address_line1}, ${physician_address_line2}, ${physician_city} ${physician_state}</p>
+        <p>Office Contact: ___________________________ Notes: ___________________________</p>
+    </div>
+
+    <p class="small-print">
+        Abbott provides this information as a courtesy. It is subject to change and interpretation. The customer is ultimately responsible for determining the appropriate codes, coverage, and payment policies for individual patients. Abbott does not guarantee third party coverage or payment for our products or reimburse customers for claims that are denied by third party payors.<br>
+        *For Local Coverage Determination (L33822)<br>
+        Please see https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33822&ver=52 for more information.<br>
+        See important safety information on reverse.
+    </p>
+
+    <!-- Page 2 -->
+    <div class="container">
+        <h1>Certification of Medical Necessity Diabetes Supplies: Glucose Sensors</h1>
+        
+        <p>Date: ${certification_date}</p>
+        
+        <div class="patient-info">
+            <p>Patient's Name: ${patient_name}</p>
+            <p>Patient's Date of Birth: ${date_of_birth}</p>
+        </div>
+        
+        <p>To Whom It May Concern:</p>
+        
+        <p>This letter serves as a Prescription and Letter of Medical Necessity for the above-referenced patient for glucose sensors as part of their diabetes supplies. The following prerequisites have been met:</p>
+        
+        <ul class="checkbox-list">
+            <li><input type="checkbox"> Patient has a history of severe hypoglycemia requiring assistance.</li>
+            <li><input type="checkbox"> Patient has experienced unawareness of hypoglycemic episodes.</li>
+            <li><input type="checkbox"> Patient has a history of labile glucose control despite optimal therapy regimes.</li>
+            <li><input type="checkbox"> Patient has a sub-optimal A1c level or glucose target despite optimal therapy regimes.</li>
+            <li><input type="checkbox"> Patient has a history of nocturnal hypoglycemia.</li>
+            <li><input type="checkbox"> Patient demonstrates compliance to prescribed regimen and the willingness to attend regular medical follow-up exams.</li>
+            <li><input type="checkbox"> Patient agrees to work with their physician, nurse educator and dietitian to ensure correct device use.</li>
+        </ul>
+        
+        <p>I certify that this information is correct. The use of Continuous Glucose sensing technology has been proven to lower HbA1c resulting in improved diabetes control, decrease of the risk of hypoglycemia, and reduction of diabetes-related complications. The necessity of these supplies is to ensure the patient’s ability to maintain proper glycemic control and reduce the long-term risk of complications associated with diabetes.</p>
+        
+        <div class="signature-line"></div>
+        <p>Physician's Signature: ___________________________</p>
+        <p>Date: ___________________________</p>
+    </div>
+
+</body>
+</html>
+"""
+
+
+def display_cgm_form():
+    st.title("CGM Form Submission")
+    st.header("Patient and Doctor Information")
+    # Create rows with aligned fields
+    with st.container():
+                        # Row 1
+        col1, col2, col3 = st.columns([1, 1, 1])  # Adjust proportions if needed
+
+        with col1:
+            st.subheader("Patient Information")
+        with col2:
+            st.subheader("Patient Metrics")
+        with col3:
+            st.subheader("Doctor Information")
+        col1, col2,col3 = st.columns(3)
+        
+        with col1:
+            date = st.date_input("Date")
+            pt_name = st.text_input("Full Name")
+            ptPhone = st.text_input("Patient Phone Number")
+            ptAddress = st.text_input("Patient Address")
+            ptCity = st.text_input("Patient City")
+            ptState = st.text_input("Patient State")
+            ptZip = st.text_input("Patient Zip Code")
+
+        with col2:
+            ptDob = st.text_input("Date of Birth")
+            primary_insurance_name = st.text_input("Primary Insurance Name")
+            primary_insurance_id = st.text_input("Primary Insurance ID")
+            secondary_insurance_name = st.text_input("Secondary Insurance Name")
+            secondary_insurance_id = st.text_input("Secondary Insurance ID")
+        with col3:
+            drName = st.text_input("Doctor Name")
+            drAddress = st.text_input("Doctor Address")
+            drCity = st.text_input("Doctor City")
+            drState = st.text_input("Doctor State")
+            drZip = st.text_input("Doctor Zip Code")
+            drPhone = st.text_input("Doctor Phone Number")
+            drFax = st.text_input("Doctor Fax Number")
+            drNpi = st.text_input("Doctor NPI")
+            notes = st.text_area("Notes")
+
+        # Submit Button
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+
+    def validate_all_fields():
+        required_fields = [
+            date, pt_name, ptPhone, ptAddress,
+            ptCity, ptState, ptZip, ptDob, primary_insurance_name,
+            primary_insurance_id, secondary_insurance_name, secondary_insurance_id,
+            drName, drAddress, drCity, drState, drZip,
+            drPhone, drFax, drNpi, notes
+        ]
+        for field in required_fields:
+            if not field:
+                st.warning(f"{field} is required.")
+                return False
+        return True
+
+    if st.button("Submit", use_container_width=True):
+        if not validate_all_fields():
+            st.warning("Please fill out all required fields.")
+        else:
+            form_data = {
+                "entry.700175772": date.strftime("%m/%d/%Y"),  # Date
+                "entry.1992907553": pt_name,        # PT Name
+                "entry.1178853697": ptPhone,                   # Phone
+                "entry.478400313": ptAddress,                  # PT Address
+                "entry.1687085318": ptCity,                    # PT City
+                "entry.1395966108": ptState,                   # PT State
+                "entry.1319952523": ptZip,                     # PT Postal Code
+                "entry.1553550428": ptDob,                     # PT DOB
+                "entry.287019030": primary_insurance_name,     # Primary Insurance Name
+                "entry.1122949100": primary_insurance_id,      # Primary Insurance ID
+                "entry.2102408689": secondary_insurance_name,  # Secondary Insurance Name
+                "entry.1278616009": secondary_insurance_id,    # Secondary Insurance ID
+                "entry.2090908898": drName,                    # DR Name
+                "entry.198263517": drAddress,                  # DR Address
+                "entry.1349410133": drCity,                    # DR City
+                "entry.847367280": drState,                    # DR State
+                "entry.1652935364": drZip,                     # DR Postal Code
+                "entry.756850883": drPhone,                    # DR Phone Number
+                "entry.1725680069": drFax,                     # DR Fax
+                "entry.314880762": drNpi,                      # DR NPI
+                "entry.1322384700": notes                      # Notes
+            }
+
+            encoded_data = urlencode(form_data, quote_via=quote_plus)
+            form_url = "https://docs.google.com/forms/d/e/1FAIpQLSeLh1vfsBq6bQYmUy_FsRssgj2PGwGL0tHGNn4QhzJOprreYA/formResponse"
+            full_url = f"{form_url}?{encoded_data}"
+            
+            # Test the URL
+            try:
+                response = requests.get(full_url)
+                if response.status_code == 200:
+                    st.write(f"[Click here to open the CGM form](<{full_url}>)")
+                else:
+                    st.error(f"Failed to access the CGM form. Status Code: {response.status_code}")
+            except Exception as e:
+                st.error(f"Error accessing the CGM form: {e}")
+
+            st.success("The CGM form is ready for submission. Please click the link above to submit.")
+
 
 def get_brace_type(brace_code):
     for brace_type, brace_data in brace_info.items():
@@ -1560,10 +1813,10 @@ def main():
                             )
 
                             generate_pdf(html_filled)  # Call the function to generate PDF
-
-
-
-
+    
+    elif page == "CGM Form":
+        display_cgm_form()
+        
     elif page == "Send Fax":
         st.title("Send Fax")
         
