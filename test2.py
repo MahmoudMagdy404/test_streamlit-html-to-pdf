@@ -181,15 +181,15 @@ I, the undersigned, certify that the prescribed orthosis is medically necessary 
     </html>
     """
 def get_affected_areas(brace_code):
-    if brace_code in ['L0457-G', 'L0637']:
+    if brace_code in ['L0457-G', 'L0637','L0651-G']:
         return '<div style="margin-bottom: 5px;"><input type="checkbox" class="custom-checkbox" checked>Back</div>'
-    elif brace_code in ['L1845', 'L1852-G', 'L1843']:
+    elif brace_code in ['L1845', 'L1852-G', 'L1833-G']:
         return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Knee</div>' \
                '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Knee</div>'
     elif brace_code == 'L3761':
         return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Elbow</div>' \
                '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Elbow</div>'
-    elif brace_code == 'L3960':
+    elif brace_code in ['L3960','L3660-G']:
         return '<div style="display: inline-block; margin-right: 30px;"><input type="checkbox" class="custom-checkbox" checked>Left Shoulder</div>' \
                '<div style="display: inline-block;margin-left: 60px;"><input type="checkbox" class="custom-checkbox" checked>Right Shoulder</div>'
     elif brace_code in ['L1971', 'L1906']:
@@ -430,7 +430,7 @@ brace_info = {
             "Other Intervertebral disc disorders, lumbosacral region (M51.87)",
             "Low back pain (M54.5)"
         ],
-        'L0651-G': [
+        'L0651-G': ["lumbar-Sacral Orthosis, Sagittal-Coronal Control, With Rigid Anterior And Posterior Frame/Panel(S), Posterior Extends From Sacrococcygeal Junction To 7-9 Vertebra, Lateral Strength Provided By Rigid Lateral Frame/Panel(S), Produces Intracavitary Pressure To Reduce Load On Intervertebral Discs, Includes Straps, Closures, May Include Padding Shoulder Straps, Pendulous Abdomen Design,  Prefabricated, Off-The-Shelf.",
             "Lumbar/ Lumbosacral Intervertebral Disc Degeneration (M51.36)",
             "Other intervertebral disc degeneration, lumbosacral region (M51.37)",
             "Spinal Stenosis, lumbar region (M48.06)",
@@ -453,7 +453,8 @@ brace_info = {
                     "Chronic instability of knee, right knee (M23.51)",
                     "Chronic instability of knee, left knee (M23.52)",
                     "Other /Explain: " ],
-        'L1852-G': ['Knee orthosis, double upright, thigh and calf, with adjustable flexion and extension joint (unicentric or    polycentric), medial-lateral and rotation control, with or without varus/valgus adjustment, prefabricated item that has been trimmed, bent, molded, assembled, or otherwise customized to fit a specific patient by an individual with expertise; includes L2397 Suspension Sleeve.',
+        
+        'L1852-G': ['Adjustable Flexion & Extension Joint (Unicentric or Polycentric), Medial-Lateral & Rotation Control,+/- Varus/Valgus Adjustment, Prefabricated, Off the Shelf, includes L2397 Suspension Sleeve',
                     "Hypermobility Syndrome (M35.7) (check below that apply)",
                     "Grade < 2mm Tight with firm end-feel",
                     " Grade I 3-5mm Nominal increase in laxity compared to contralateral knee.",
@@ -507,7 +508,7 @@ brace_info = {
                     "M25.511 Pain in right Shoulder",
                     "M25.512 Pain in Left Shoulder"
                   ],
-        'L3660-G': ['Shoulder elbow wrist hand orthosis, abduction positioning, airplane design, prefabricated, includes fitting and adjustment',
+        'L3660-G': ['SHOULDER ORTHOSIS, FIGURE OF EIGHT DESIGN ABDUCTION RESTRAINER, CANVAS AND WEBBING, PREFABRICATED, OFF-THE-SHELF.',
                   "M75.31 Calcific tendinitis of left shoulder",
                     "M75.32 Calcific tendinitis of right shoulder",
                     "M75.41 Impingement syndrome of left shoulder", 
