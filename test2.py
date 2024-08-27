@@ -8,14 +8,9 @@ import requests
 from PyPDF2 import PdfMerger, PdfReader
 import re
 import base64
-from google.oauth2 import service_account
 import streamlit as st
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
 import io
 import json
-from google_auth_oauthlib.flow import InstalledAppFlow
 # import google.auth
 # from faxplus import ApiClient, OutboxApi, OutboxComment, RetryOptions, OutboxOptions, OutboxCoverPage, PayloadOutbox , FilesApi 
 # from faxplus.configuration import Configuration
@@ -24,11 +19,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 import logging
-import html
-from google.auth.transport.requests import Request
-from pyhtml2pdf import converter
 import random
 
 def get_brace_type(brace_code):
@@ -1223,155 +1214,155 @@ def on_row_select():
 
 
 
-TOKEN_FOLDER_ID = '1HDwNvgFv_DSEH2WKNfLNheKXxKT_hDM9'
-CREDENTIALS_FILE_NAME = 'credentials.json'
-TOKEN_FILE_NAME = 'token.json'
-SCOPES = ["https://www.googleapis.com/auth/drive"]
-# credentials_json = st.secrets["google_credentials"]["credentials_json"]
+# TOKEN_FOLDER_ID = '1HDwNvgFv_DSEH2WKNfLNheKXxKT_hDM9'
+# CREDENTIALS_FILE_NAME = 'credentials.json'
+# TOKEN_FILE_NAME = 'token.json'
+# SCOPES = ["https://www.googleapis.com/auth/drive"]
+# # credentials_json = st.secrets["google_credentials"]["credentials_json"]
 
 
 
-# Constants
-SCOPES = ["https://www.googleapis.com/auth/drive"]
-FOLDER_ID = "15I95Loh35xI2PcGa36xz7SgMtclo-9DC"
-GITHUB_USER = 'MahmoudMagdy404'
-GITHUB_PAO = st.secrets["github_token"]["token"]
-TOKEN_FILE_URL = "https://api.github.com/repos/MahmoudMagdy404/files_holder/contents/token.json"
+# # Constants
+# SCOPES = ["https://www.googleapis.com/auth/drive"]
+# FOLDER_ID = "15I95Loh35xI2PcGa36xz7SgMtclo-9DC"
+# GITHUB_USER = 'MahmoudMagdy404'
+# GITHUB_PAO = st.secrets["github_token"]["token"]
+# TOKEN_FILE_URL = "https://api.github.com/repos/MahmoudMagdy404/files_holder/contents/token.json"
 
-def read_token_from_github():
-    """Read the token from GitHub repository."""
-    github_session = requests.Session()
-    github_session.auth = (GITHUB_USER, GITHUB_PAO)
-    try:
-        response = github_session.get(TOKEN_FILE_URL)
-        response.raise_for_status()
-        content = response.json()['content']
-        decoded_content = base64.b64decode(content).decode('utf-8')
-        return json.loads(decoded_content)
-    except Exception as e:
-        st.error(f"Failed to read token from GitHub: {e}")
-        return None
+# def read_token_from_github():
+#     """Read the token from GitHub repository."""
+#     github_session = requests.Session()
+#     github_session.auth = (GITHUB_USER, GITHUB_PAO)
+#     try:
+#         response = github_session.get(TOKEN_FILE_URL)
+#         response.raise_for_status()
+#         content = response.json()['content']
+#         decoded_content = base64.b64decode(content).decode('utf-8')
+#         return json.loads(decoded_content)
+#     except Exception as e:
+#         st.error(f"Failed to read token from GitHub: {e}")
+#         return None
 
-def write_token_to_github(token_data):
-    """Write the token to GitHub repository."""
-    github_session = requests.Session()
-    github_session.auth = (GITHUB_USER, GITHUB_PAO)
-    try:
-        response = github_session.get(TOKEN_FILE_URL)
-        response.raise_for_status()
-        current_file = response.json()
+# def write_token_to_github(token_data):
+#     """Write the token to GitHub repository."""
+#     github_session = requests.Session()
+#     github_session.auth = (GITHUB_USER, GITHUB_PAO)
+#     try:
+#         response = github_session.get(TOKEN_FILE_URL)
+#         response.raise_for_status()
+#         current_file = response.json()
         
-        content = base64.b64encode(json.dumps(token_data).encode()).decode()
+#         content = base64.b64encode(json.dumps(token_data).encode()).decode()
         
-        data = {
-            "message": "Update token.json",
-            "content": content,
-            "sha": current_file['sha']
-        }
+#         data = {
+#             "message": "Update token.json",
+#             "content": content,
+#             "sha": current_file['sha']
+#         }
         
-        response = github_session.put(TOKEN_FILE_URL, json=data)
-        response.raise_for_status()
-        st.success("Token updated successfully in GitHub.")
-    except Exception as e:
-        st.error(f"Failed to write token to GitHub: {e}")
+#         response = github_session.put(TOKEN_FILE_URL, json=data)
+#         response.raise_for_status()
+#         st.success("Token updated successfully in GitHub.")
+#     except Exception as e:
+#         st.error(f"Failed to write token to GitHub: {e}")
 
-def get_drive_service(creds):
-    """Get Google Drive service."""
-    return build('drive', 'v3', credentials=creds)
+# def get_drive_service(creds):
+#     """Get Google Drive service."""
+#     return build('drive', 'v3', credentials=creds)
 
-def get_credentials():
-    """Get or refresh Google credentials."""
-    token_data = read_token_from_github()
+# def get_credentials():
+#     """Get or refresh Google credentials."""
+#     token_data = read_token_from_github()
     
-    if not token_data:
-        st.warning("No token found in GitHub. Initiating new authentication flow.")
-        flow = InstalledAppFlow.from_client_config(
-            json.loads(st.secrets["google_credentials"]["credentials_json"]),
-            SCOPES
-        )
-        creds = flow.run_local_server(port=0)
-        write_token_to_github(json.loads(creds.to_json()))
-        return creds
+#     if not token_data:
+#         st.warning("No token found in GitHub. Initiating new authentication flow.")
+#         flow = InstalledAppFlow.from_client_config(
+#             json.loads(st.secrets["google_credentials"]["credentials_json"]),
+#             SCOPES
+#         )
+#         creds = flow.run_local_server(port=0)
+#         write_token_to_github(json.loads(creds.to_json()))
+#         return creds
     
-    creds = Credentials.from_authorized_user_info(token_data, SCOPES)
+#     creds = Credentials.from_authorized_user_info(token_data, SCOPES)
     
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            write_token_to_github(json.loads(creds.to_json()))
-        else:
-            flow = InstalledAppFlow.from_client_config(
-                json.loads(st.secrets["google_credentials"]["credentials_json"]),
-                SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-            write_token_to_github(json.loads(creds.to_json()))
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#             write_token_to_github(json.loads(creds.to_json()))
+#         else:
+#             flow = InstalledAppFlow.from_client_config(
+#                 json.loads(st.secrets["google_credentials"]["credentials_json"]),
+#                 SCOPES
+#             )
+#             creds = flow.run_local_server(port=0)
+#             write_token_to_github(json.loads(creds.to_json()))
     
-    return creds
+#     return creds
 
-def combine_pdfs(fname):
-    """Combine PDFs from Google Drive folder."""
-    creds = get_credentials()
-    if not creds:
-        return None, "Failed to obtain valid credentials. Please try authenticating again."
+# def combine_pdfs(fname):
+#     """Combine PDFs from Google Drive folder."""
+#     creds = get_credentials()
+#     if not creds:
+#         return None, "Failed to obtain valid credentials. Please try authenticating again."
 
-    try:
-        service = get_drive_service(creds)
-        query = f"'{FOLDER_ID}' in parents"
+#     try:
+#         service = get_drive_service(creds)
+#         query = f"'{FOLDER_ID}' in parents"
 
-        st.info("Querying Google Drive...")
-        results = service.files().list(q=query, pageSize=20, fields="nextPageToken, files(id, name, mimeType)").execute()
-        items = results.get("files", [])
+#         st.info("Querying Google Drive...")
+#         results = service.files().list(q=query, pageSize=20, fields="nextPageToken, files(id, name, mimeType)").execute()
+#         items = results.get("files", [])
 
-        if not items:
-            return None, "No files found in the specified folder."
+#         if not items:
+#             return None, "No files found in the specified folder."
 
-        fname = fname.strip().lower()
-        target_files = [file for file in items if fname in file["name"].lower()]
+#         fname = fname.strip().lower()
+#         target_files = [file for file in items if fname in file["name"].lower()]
 
-        st.info(f"Searching for files with name containing: {fname}")
-        for file in items:
-            st.info(f"Found file: {file['name']}")
+#         st.info(f"Searching for files with name containing: {fname}")
+#         for file in items:
+#             st.info(f"Found file: {file['name']}")
 
-        if not target_files:
-            return None, "No matching files found."
+#         if not target_files:
+#             return None, "No matching files found."
 
-        st.info(f"Found {len(target_files)} matching files. Combining PDFs...")
+#         st.info(f"Found {len(target_files)} matching files. Combining PDFs...")
 
-        merger = PdfMerger()
-        for target_file in target_files:
-            mime_type = target_file.get("mimeType")
-            file_id = target_file.get("id")
+#         merger = PdfMerger()
+#         for target_file in target_files:
+#             mime_type = target_file.get("mimeType")
+#             file_id = target_file.get("id")
 
-            st.info(f"Processing file: {target_file['name']}")
+#             st.info(f"Processing file: {target_file['name']}")
 
-            if mime_type.startswith("application/vnd.google-apps."):
-                request = service.files().export_media(fileId=file_id, mimeType="application/pdf")
-            else:
-                request = service.files().get_media(fileId=file_id)
+#             if mime_type.startswith("application/vnd.google-apps."):
+#                 request = service.files().export_media(fileId=file_id, mimeType="application/pdf")
+#             else:
+#                 request = service.files().get_media(fileId=file_id)
 
-            fh = io.BytesIO()
-            downloader = MediaIoBaseDownload(fh, request)
-            done = False
-            while not done:
-                status, done = downloader.next_chunk()
-                st.info(f"Download {int(status.progress() * 100)}%")
-            fh.seek(0)
+#             fh = io.BytesIO()
+#             downloader = MediaIoBaseDownload(fh, request)
+#             done = False
+#             while not done:
+#                 status, done = downloader.next_chunk()
+#                 st.info(f"Download {int(status.progress() * 100)}%")
+#             fh.seek(0)
 
-            pdf_reader = PdfReader(fh)
-            merger.append(pdf_reader)
+#             pdf_reader = PdfReader(fh)
+#             merger.append(pdf_reader)
 
-        st.info("Finalizing PDF...")
-        output = io.BytesIO()
-        merger.write(output)
-        merger.close()
-        output.seek(0)
-        st.info("PDF combination complete!")
+#         st.info("Finalizing PDF...")
+#         output = io.BytesIO()
+#         merger.write(output)
+#         merger.close()
+#         output.seek(0)
+#         st.info("PDF combination complete!")
 
-        return output, None
-    except Exception as error:
-        st.error(f"An error occurred: {str(error)}")
-        return None, str(error)
+#         return output, None
+#     except Exception as error:
+#         st.error(f"An error occurred: {str(error)}")
+#         return None, str(error)
 
     
 def main():
